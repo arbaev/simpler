@@ -4,6 +4,7 @@ class TestsController < Simpler::Controller
     @time = Time.now
     # render plain: "plain text response"
     # status 201
+    # headers['Simpler-Special'] = 'something/cool'
   end
 
   def create

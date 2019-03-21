@@ -2,6 +2,7 @@ require_relative 'view'
 
 module Simpler
   class Controller
+    CONTENT_TYPES = { plain: 'text/plain', html: 'text/html' }.freeze
 
     attr_reader :name, :request, :response
 
@@ -40,12 +41,7 @@ module Simpler
     end
 
     def set_headers(type = :html)
-      case type
-      when :plain
-        @response['Content-Type'] = 'text/plain'
-      else
-        @response['Content-Type'] = 'text/html'
-      end
+      @response['Content-Type'] = CONTENT_TYPES[type]
     end
 
     def write_response(body)
@@ -64,5 +60,8 @@ module Simpler
       @request.env['simpler.template'] = template
     end
 
+    def headers
+      @response.header
+    end
   end
 end
