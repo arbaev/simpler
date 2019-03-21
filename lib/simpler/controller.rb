@@ -15,9 +15,16 @@ module Simpler
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
 
-      set_default_headers
       send(action)
-      write_response
+      template = @request.env['simpler.template']
+
+      if template.is_a?(Hash) && template.has_key?(:plain)
+        set_headers(:plain)
+        write_response(template[:plain])
+      else
+        set_headers(:html)
+        write_response(render_body)
+      end
 
       @response.finish
     end
@@ -28,13 +35,16 @@ module Simpler
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
 
-    def set_default_headers
-      @response['Content-Type'] = 'text/html'
+    def set_headers(type = :html)
+      case type
+      when :plain
+        @response['Content-Type'] = 'text/plain'
+      else
+        @response['Content-Type'] = 'text/html'
+      end
     end
 
-    def write_response
-      body = render_body
-
+    def write_response(body)
       @response.write(body)
     end
 
