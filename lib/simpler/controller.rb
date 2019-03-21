@@ -22,7 +22,7 @@ module Simpler
       if template.is_a?(Hash) && template.has_key?(:plain)
         set_headers(:plain)
         write_response(template[:plain])
-      else
+      elsif controller_found?
         set_headers(:html)
         write_response(render_body)
       end
@@ -31,6 +31,16 @@ module Simpler
     end
 
     private
+
+    def controller_found?
+      !@request.env.has_key?('not_found')
+    end
+
+    def not_found
+      status 404
+      set_headers(:plain)
+      write_response("URL not found")
+    end
 
     def status(number)
       @response.status = number

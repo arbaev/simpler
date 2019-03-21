@@ -30,8 +30,11 @@ module Simpler
       route = @router.route_for(env)
       controller = route.controller.new(env)
       action = route.action
-
       make_response(controller, action)
+
+    rescue NoMethodError => e
+      env['not_found'] = e
+      make_response(Controller.new(env), :not_found)
     end
 
     private
