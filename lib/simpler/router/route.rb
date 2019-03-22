@@ -2,30 +2,28 @@ module Simpler
   class Router
     class Route
 
-      attr_reader :controller, :action
+      attr_reader :controller, :action, :param
 
       def initialize(method, path, controller, action)
         @method = method
-        @path, @id = split_path(path)
+        @path, text_id = path
         @controller = controller
         @action = action
+        @param = nil
+        @id = text_id&.to_sym
       end
 
       def match?(method, path)
-        mpath, mparam = split_path(path)
+        mpath, value = path
 
-        if mparam.nil?
+        if value.nil?
           @method == method && mpath.match(@path)
-        else
+        elsif value && @id
+          @param = {@id => value.to_i}
           @method == method && mpath.match(@path) && @id
         end
       end
 
-      private
-
-      def split_path(path)
-        path.split('/').reject(&:empty?)
-      end
     end
   end
 end
