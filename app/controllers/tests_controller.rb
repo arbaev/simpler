@@ -7,8 +7,9 @@ class TestsController < Simpler::Controller
     # headers['Simpler-Special'] = 'something/cool'
   end
 
-  def create
+  def create; end
 
+  def show
+    @params = params[:id]
   end
-
 end
