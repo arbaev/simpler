@@ -63,7 +63,7 @@ module Simpler
     end
 
     def params
-      @request.params
+      @request.env[:params]
     end
 
     def render(template)
