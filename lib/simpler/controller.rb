@@ -18,8 +18,7 @@ module Simpler
 
       send(action)
       template = @request.env['simpler.template']
-
-      if template.is_a?(Hash) && template.has_key?(:plain)
+      if template.is_a?(Hash) && template.key?(:plain)
         set_headers(:plain)
         write_response(template[:plain])
       elsif controller_found?
@@ -32,18 +31,8 @@ module Simpler
 
     private
 
-    def controller_found?
-      !@request.env.has_key?('not_found')
-    end
-
-    def not_found
-      status 404
-      set_headers(:plain)
-      write_response("URL not found")
-    end
-
-    def status(number)
-      @response.status = number
+    def status(code)
+      @response.status = code
     end
 
     def extract_name

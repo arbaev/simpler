@@ -2,14 +2,14 @@ module Simpler
   class Router
     class Route
 
-      attr_reader :controller, :action, :param
+      attr_reader :controller, :action, :params
 
       def initialize(method, path, controller, action)
         @method = method
         @path, text_id = path
         @controller = controller
         @action = action
-        @param = nil
+        @params = nil
         @id = text_id&.to_sym
       end
 
@@ -19,7 +19,7 @@ module Simpler
         if value.nil?
           @method == method && mpath.match(@path)
         elsif value && @id
-          @param = {@id => value.to_i}
+          @params = {@id => value.to_i}
           @method == method && mpath.match(@path) && @id
         end
       end

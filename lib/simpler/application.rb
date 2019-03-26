@@ -28,17 +28,20 @@ module Simpler
 
     def call(env)
       route = @router.route_for(env)
-      env[:params] = route.param
+
+      return not_found if route.nil?
+
+      env[:params] = route.params
       controller = route.controller.new(env)
       action = route.action
       make_response(controller, action)
-
-    rescue NoMethodError => e
-      env['not_found'] = e
-      make_response(Controller.new(env), :not_found)
     end
 
     private
+
+    def not_found
+      [404, {'Content-Type' => 'text/plain'}, ['URL not found']]
+    end
 
     def require_app
       Dir["#{Simpler.root}/app/**/*.rb"].each { |file| require file }
