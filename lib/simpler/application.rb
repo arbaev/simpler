@@ -32,11 +32,17 @@ module Simpler
 
       controller = route.controller.new(env)
       action = route.action
-      params = route.params
-      make_response(controller, action, params)
+      env['simpler.params'] = collect_params(route, env)
+      make_response(controller, action)
     end
 
     private
+
+    def collect_params(route, env)
+      query_params = Rack::Utils.parse_nested_query(env['QUERY_STRING'])
+      path_params = route.recognize_params(env['REQUEST_PATH'])
+      path_params.merge(query_params)
+    end
 
     def not_found
       [404, {'Content-Type' => 'text/plain'}, ['URL not found']]
@@ -56,8 +62,8 @@ module Simpler
       @db = Sequel.connect(database_config)
     end
 
-    def make_response(controller, action, params)
-      controller.make_response(action, params)
+    def make_response(controller, action)
+      controller.make_response(action)
     end
 
   end

@@ -2,24 +2,17 @@ module Simpler
   class Router
     class Route
 
-      attr_reader :controller, :action, :params
+      attr_reader :controller, :action
 
       def initialize(method, path, controller, action)
         @method = method
         @path = path
         @controller = controller
         @action = action
-        @params = nil
       end
 
       def match?(method, path)
-        @method == method && recognize_params(path)
-      end
-
-      private
-
-      def split_path(path)
-        path[1..-1].split('/')
+        @method == method && path_match?(path)
       end
 
       def recognize_params(path)
@@ -36,8 +29,18 @@ module Simpler
             return nil
           end
 
-          @params = params
+          params
         end
+      end
+
+      private
+
+      def path_match?(path)
+        !!recognize_params(path)
+      end
+
+      def split_path(path)
+        path[1..-1].split('/')
       end
 
       def convert_param_to_sym(param)

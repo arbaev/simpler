@@ -12,10 +12,9 @@ module Simpler
       @response = Rack::Response.new
     end
 
-    def make_response(action, params = nil)
+    def make_response(action)
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
-      @request.env['simpler.params'] = params
 
       send(action)
 
