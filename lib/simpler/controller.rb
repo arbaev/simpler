@@ -12,19 +12,16 @@ module Simpler
       @response = Rack::Response.new
     end
 
-    def make_response(action)
+    def make_response(action, params = nil)
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
+      @request.env['simpler.params'] = params
 
       send(action)
+
       template = @request.env['simpler.template']
-      if template.is_a?(Hash) && template.key?(:plain)
-        set_headers(:plain)
-        write_response(template[:plain])
-      elsif controller_found?
-        set_headers(:html)
-        write_response(render_body)
-      end
+      set_content_type_header(template&.keys&.first)
+      write_response(render_body(template))
 
       @response.finish
     end
@@ -39,7 +36,8 @@ module Simpler
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
 
-    def set_headers(type = :html)
+    def set_content_type_header(type)
+      type ||= :html
       @response['Content-Type'] = CONTENT_TYPES[type]
     end
 
@@ -47,12 +45,12 @@ module Simpler
       @response.write(body)
     end
 
-    def render_body
-      View.new(@request.env).render(binding)
+    def render_body(template)
+      template ? template.values.first : View.new(@request.env).render(binding)
     end
 
     def params
-      @request.env[:params]
+      @request.env['simpler.params']
     end
 
     def render(template)

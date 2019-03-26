@@ -17,7 +17,7 @@ module Simpler
 
     def route_for(env)
       method = env['REQUEST_METHOD'].downcase.to_sym
-      path = split_path(env['PATH_INFO'])
+      path = env['PATH_INFO']
       @routes.find { |route| route.match?(method, path) }
     end
 
@@ -27,17 +27,13 @@ module Simpler
       route_point = route_point.split('#')
       controller = controller_from_string(route_point[0])
       action = route_point[1]
-      route = Route.new(method, split_path(path), controller, action)
+      route = Route.new(method, path, controller, action)
 
       @routes.push(route)
     end
 
     def controller_from_string(controller_name)
       Object.const_get("#{controller_name.capitalize}Controller")
-    end
-
-    def split_path(path)
-      path.delete(':').split('/').reject(&:empty?)
     end
   end
 end
