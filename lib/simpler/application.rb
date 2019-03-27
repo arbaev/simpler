@@ -45,7 +45,7 @@ module Simpler
     end
 
     def not_found
-      [404, {'Content-Type' => 'text/plain'}, ['URL not found']]
+      [404, {'Content-Type' => 'text/plain'}, ["URL not found\n"]]
     end
 
     def require_app
