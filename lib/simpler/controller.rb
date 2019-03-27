@@ -45,7 +45,8 @@ module Simpler
     end
 
     def render_body(template)
-      template ? template.values.first : View.new(@request.env).render(binding)
+      render(template)
+      View.new(@request.env).render(binding)
     end
 
     def params

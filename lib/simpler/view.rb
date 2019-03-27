@@ -10,9 +10,12 @@ module Simpler
     end
 
     def render(binding)
-      template = File.read(template_path)
-
-      ERB.new(template).result(binding)
+      if template.nil?
+        template_file = File.read(template_path)
+        ERB.new(template_file).result(binding)
+      else
+        template.values.first
+      end
     end
 
     private

@@ -32,16 +32,15 @@ module Simpler
 
       controller = route.controller.new(env)
       action = route.action
-      env['simpler.params'] = collect_params(route, env)
+      env['simpler.params'] = collect_params(route, controller)
       make_response(controller, action)
     end
 
     private
 
-    def collect_params(route, env)
-      query_params = Rack::Utils.parse_nested_query(env['QUERY_STRING'])
-      path_params = route.recognize_params(env['REQUEST_PATH'])
-      path_params.merge(query_params)
+    def collect_params(route, controller)
+      path_params = route.recognize_params(controller.request.path)
+      path_params.merge(controller.request.params)
     end
 
     def not_found

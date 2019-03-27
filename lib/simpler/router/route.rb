@@ -19,6 +19,8 @@ module Simpler
         source_path_arr = split_path(path)
         route_path_arr = split_path(@path)
 
+        return nil unless source_path_arr.size == route_path_arr.size
+
         source_path_arr.reduce({}) do |params, el|
           route_el = route_path_arr[source_path_arr.index(el)]
           return nil if route_el.nil?
