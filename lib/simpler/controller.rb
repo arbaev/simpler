@@ -10,6 +10,7 @@ module Simpler
       @name = extract_name
       @request = Rack::Request.new(env)
       @response = Rack::Response.new
+      @request.env['simpler.template'] = {}
     end
 
     def make_response(action)
@@ -19,8 +20,7 @@ module Simpler
       send(action)
 
       template = @request.env['simpler.template']
-      set_content_type_header(template&.keys&.first)
-      write_response(render_body(template))
+      write_response(render_response(template))
 
       @response.finish
     end
@@ -37,16 +37,20 @@ module Simpler
 
     def set_content_type_header(type)
       type ||= :html
-      @response['Content-Type'] = CONTENT_TYPES[type]
+      @response['Content-Type'] = CONTENT_TYPES[type] || 'text/unknown'
     end
 
     def write_response(body)
       @response.write(body)
     end
 
-    def render_body(template)
+    def render_response(template)
+      set_content_type_header(template.keys.first)
       render(template)
       View.new(@request.env).render(binding)
+
+    rescue ArgumentError => e
+      puts e.message
     end
 
     def params

@@ -12,33 +12,43 @@ module Simpler
       end
 
       def match?(method, path)
-        @method == method && path_match?(path)
+        @method == method && match_path?(path)
       end
 
-      def recognize_params(path)
-        source_path_arr = split_path(path)
-        route_path_arr = split_path(@path)
+      def match_path?(path)
+        path_arr = split_path(path)
+        pattern = convert_path_to_pattern(@path)
 
-        return nil unless source_path_arr.size == route_path_arr.size
+        return false unless size_eql?(path_arr, pattern)
 
-        source_path_arr.reduce({}) do |params, el|
-          route_el = route_path_arr[source_path_arr.index(el)]
-          return nil if route_el.nil?
-
-          if route_el[0] == ':'
-            params[convert_param_to_sym(route_el)] = el
-          elsif route_el != el
-            return nil
+        pattern.each.with_index do |el, i|
+          unless el.is_a?(Symbol)
+            return false if el != path_arr[i]
           end
-
-          params
         end
+
+        true
+      end
+
+      def path_params(path)
+        path_arr = split_path(path)
+        pattern = convert_path_to_pattern(@path)
+
+        result = pattern.map.with_index do |el, i|
+          el.is_a?(Symbol) ? [el, path_arr[i]] : next
+        end
+
+        result.compact.to_h
       end
 
       private
 
-      def path_match?(path)
-        !!recognize_params(path)
+      def convert_path_to_pattern(path)
+        split_path(path).map { |el| el[0] == ':' ? convert_param_to_sym(el) : el }
+      end
+
+      def size_eql?(path1, path2)
+        path1.size == path2.size
       end
 
       def split_path(path)

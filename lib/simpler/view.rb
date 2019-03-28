@@ -10,15 +10,24 @@ module Simpler
     end
 
     def render(binding)
-      if template.nil?
+      case template.keys.first
+      when :plain
+        render_plain
+      # when :json
+      #   render_json
+      when nil
         template_file = File.read(template_path)
         ERB.new(template_file).result(binding)
       else
-        template.values.first
+        raise ArgumentError, 'Unknown template format'
       end
     end
 
     private
+
+    def render_plain
+      template.values.first
+    end
 
     def controller
       @env['simpler.controller']
@@ -33,7 +42,7 @@ module Simpler
     end
 
     def template_path
-      path = template || [controller.name, action].join('/')
+      path = [controller.name, action].join('/')
 
       Simpler.root.join(VIEW_BASE_PATH, "#{path}.html.erb")
     end

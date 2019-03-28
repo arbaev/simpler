@@ -32,15 +32,14 @@ module Simpler
 
       controller = route.controller.new(env)
       action = route.action
-      env['simpler.params'] = collect_params(route, controller)
+      env['simpler.params'] = collect_params(route, controller.request)
       make_response(controller, action)
     end
 
     private
 
-    def collect_params(route, controller)
-      path_params = route.recognize_params(controller.request.path)
-      path_params.merge(controller.request.params)
+    def collect_params(route, request)
+      request.params.merge(route.path_params(request.path))
     end
 
     def not_found
