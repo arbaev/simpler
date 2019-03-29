@@ -75,7 +75,17 @@ class RackLogger
   end
 
   def show_template(data)
-    return '' if data[:controller].nil?
-    data[:template]&.keys&.first || "#{data[:action]}.html.erb"
+    return 'N/A' if data[:controller].nil?
+
+    template = data[:template]
+    case template.keys.first
+    when :path
+      action = template[:path].split('/').last
+      "#{action}.html.erb"
+    when :plain
+      'plain'
+    else
+      ''
+    end
   end
 end

@@ -2,7 +2,7 @@ require_relative 'view'
 
 module Simpler
   class Controller
-    CONTENT_TYPES = { plain: 'text/plain', html: 'text/html' }.freeze
+    CONTENT_TYPES = { plain: 'text/plain', path: 'text/html' }.freeze
 
     attr_reader :name, :request, :response
 
@@ -10,7 +10,6 @@ module Simpler
       @name = extract_name
       @request = request
       @response = Rack::Response.new
-      # @request.env['simpler.template'] = {}
     end
 
     def make_response(action)
@@ -35,12 +34,9 @@ module Simpler
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
 
-    def set_content_type_header(template)
-      if template.is_a?(Hash)
-        @response['Content-Type'] = CONTENT_TYPES[template.keys.first]
-      else
-        @response['Content-Type'] = CONTENT_TYPES[:html]
-      end
+    def set_content_type_header
+      type = @request.env['simpler.template'].keys.first
+      @response['Content-Type'] = CONTENT_TYPES[type]
     end
 
     def write_response(body)
@@ -48,9 +44,21 @@ module Simpler
     end
 
     def render_response(template)
-      set_content_type_header(template)
-      @request.env['simpler.template'] = template
+      render(template)
+      set_content_type_header
       View.new(@request.env).render(binding)
+    end
+
+    def render(template)
+      template = if template.is_a?(String)
+                   { path: template }
+                 elsif template.nil?
+                   { path: [name, @request.env['simpler.action']].join('/') }
+                 else
+                   template
+                 end
+
+      @request.env['simpler.template'] = template
     end
 
     def params

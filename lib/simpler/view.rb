@@ -10,41 +10,24 @@ module Simpler
     end
 
     def render(binding)
-      if template.is_a?(Hash)
-        type, body = template.first
-        send("render_#{type}", body)
-      else
-        render_template(binding)
-      end
+      type, body = template.first
+      send("render_#{type}", body, binding)
     end
 
     private
 
-    def render_plain(body)
+    def render_plain(body, _binding)
       body
     end
 
-    def render_template(binding)
+    def render_path(path, binding)
+      template_path = Simpler.root.join(VIEW_BASE_PATH, "#{path}.html.erb")
       template_file = File.read(template_path)
       ERB.new(template_file).result(binding)
     end
 
-    def controller
-      @env['simpler.controller']
-    end
-
-    def action
-      @env['simpler.action']
-    end
-
     def template
       @env['simpler.template']
-    end
-
-    def template_path
-      path = template || [controller.name, action].join('/')
-
-      Simpler.root.join(VIEW_BASE_PATH, "#{path}.html.erb")
     end
 
   end
