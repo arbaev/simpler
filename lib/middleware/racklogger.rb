@@ -44,7 +44,6 @@ class RackLogger
 
   def log_write(data)
     @logger.info(output(data))
-    @logger.close
   end
 
   def output(data)
