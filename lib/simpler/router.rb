@@ -15,9 +15,9 @@ module Simpler
       add_route(:post, path, route_point)
     end
 
-    def route_for(env)
-      method = env['REQUEST_METHOD'].downcase.to_sym
-      path = env['PATH_INFO']
+    def route_for(request)
+      method = request.request_method.downcase.to_sym
+      path = request.path
       @routes.find { |route| route.match?(method, path) }
     end
 

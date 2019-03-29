@@ -27,12 +27,14 @@ module Simpler
     end
 
     def call(env)
-      route = @router.route_for(env)
+      @request = Rack::Request.new(env)
+      route = @router.route_for(@request)
+      env['simpler.params'] = @request.params
       return not_found if route.nil?
 
-      controller = route.controller.new(env)
+      controller = route.controller.new(@request)
       action = route.action
-      env['simpler.params'] = collect_params(route, controller.request)
+      env['simpler.params'] = collect_params(route, @request)
       make_response(controller, action)
     end
 

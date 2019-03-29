@@ -64,7 +64,7 @@ class RackLogger
   end
 
   def show_params(data)
-    parameters = data[:params].nil? || data[:params].empty? ? "none" : data[:params]
+    parameters = data[:params].empty? ? "none" : data[:params]
     "Parameters: #{parameters}"
   end
 
