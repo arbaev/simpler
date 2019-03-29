@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 require 'singleton'
 require 'sequel'
@@ -45,7 +47,7 @@ module Simpler
     end
 
     def not_found
-      [404, {'Content-Type' => 'text/plain'}, ["URL not found\n"]]
+      [404, { 'Content-Type' => 'text/plain' }, ["URL not found\n"]]
     end
 
     def require_app

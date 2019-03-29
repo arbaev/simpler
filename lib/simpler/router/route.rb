@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Simpler
   class Router
     class Route

@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'logger'
 
 class RackLogger
-  LOG_DIRNAME = "log".freeze
-  LOG_FILENAME = "app.log".freeze
+  LOG_DIRNAME = 'log'
+  LOG_FILENAME = 'app.log'
 
   def initialize(app)
     @app = app
@@ -13,14 +15,14 @@ class RackLogger
     status, headers, body = @app.call(env)
 
     data = {
-        status: status,
-        headers: headers,
-        verb: env['REQUEST_METHOD'],
-        uri: env['REQUEST_URI'],
-        controller: env['simpler.controller'],
-        action: env['simpler.action'],
-        params: env['simpler.params'],
-        template: env['simpler.template'],
+      status: status,
+      headers: headers,
+      verb: env['REQUEST_METHOD'],
+      uri: env['REQUEST_URI'],
+      controller: env['simpler.controller'],
+      action: env['simpler.action'],
+      params: env['simpler.params'],
+      template: env['simpler.template']
     }.freeze
 
     log_write(data)
@@ -59,12 +61,12 @@ class RackLogger
   end
 
   def show_handler(data)
-    handler = data[:controller].nil? ? "N/A" : "#{data[:controller].class}##{data[:action]}"
+    handler = data[:controller].nil? ? 'N/A' : "#{data[:controller].class}##{data[:action]}"
     "Handler: #{handler}"
   end
 
   def show_params(data)
-    parameters = data[:params].empty? ? "none" : data[:params]
+    parameters = data[:params].empty? ? 'none' : data[:params]
     "Parameters: #{parameters}"
   end
 

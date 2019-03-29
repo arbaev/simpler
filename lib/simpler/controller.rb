@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'view'
 
 module Simpler
@@ -68,5 +70,6 @@ module Simpler
     def headers
       @response.header
     end
+
   end
 end

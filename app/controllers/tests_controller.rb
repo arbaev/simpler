@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TestsController < Simpler::Controller
 
   def index
@@ -14,4 +16,5 @@ class TestsController < Simpler::Controller
   def show
     @params = params
   end
+
 end
