@@ -6,11 +6,7 @@ class RackLogger
 
   def initialize(app)
     @app = app
-
-    file = File.open("#{Simpler.root}/#{LOG_DIRNAME}/#{LOG_FILENAME}", "a+")
-    @logger = Logger.new(file, formatter: proc {|severity, datetime, progname, msg|
-      "#{datetime}#{msg}\n"
-    })
+    @logger = logger
   end
 
   def call(env)
@@ -25,7 +21,7 @@ class RackLogger
         action: env['simpler.action'],
         params: env['simpler.params'],
         template: env['simpler.template'],
-    }
+    }.freeze
 
     log_write(data)
 
@@ -33,6 +29,16 @@ class RackLogger
   end
 
   private
+
+  def logger
+    file = "#{Simpler.root}/#{LOG_DIRNAME}/#{LOG_FILENAME}"
+    logger = Logger.new(file, level: :info)
+    logger.formatter = proc do |_severity, datetime, _progname, msg|
+      "#{datetime}: #{msg}\n"
+    end
+
+    logger
+  end
 
   def log_write(data)
     @logger.info(output(data))
@@ -70,6 +76,6 @@ class RackLogger
 
   def show_template(data)
     return '' if data[:controller].nil?
-    data[:template].keys.first || "#{data[:action]}.html.erb"
+    data[:template]&.keys&.first || "#{data[:action]}.html.erb"
   end
 end
