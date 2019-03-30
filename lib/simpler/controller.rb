@@ -54,10 +54,10 @@ module Simpler
     def render(template)
       template = if template.is_a?(String)
                    { path: template }
-                 elsif template.nil?
-                   { path: [name, @request.env['simpler.action']].join('/') }
-                 else
+                 elsif template.is_a?(Hash)
                    template
+                 else
+                   { path: [name, @request.env['simpler.action']].join('/') }
                  end
 
       @request.env['simpler.template'] = template

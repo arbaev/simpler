@@ -23,8 +23,8 @@ module Simpler
 
         return false unless path_arr.size == pattern.size
 
-        pattern.zip(path_arr).all? do |el|
-          el.first.is_a?(Symbol) || el.first == el.last
+        pattern.zip(path_arr).all? do |pattern_part, path_part|
+          pattern_part.is_a?(Symbol) || pattern_part == path_part
         end
       end
 
