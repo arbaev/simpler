@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'router/route'
 
 module Simpler
@@ -15,10 +17,9 @@ module Simpler
       add_route(:post, path, route_point)
     end
 
-    def route_for(env)
-      method = env['REQUEST_METHOD'].downcase.to_sym
-      path = env['PATH_INFO']
-
+    def route_for(request)
+      method = request.request_method.downcase.to_sym
+      path = request.path
       @routes.find { |route| route.match?(method, path) }
     end
 
@@ -36,6 +37,5 @@ module Simpler
     def controller_from_string(controller_name)
       Object.const_get("#{controller_name.capitalize}Controller")
     end
-
   end
 end

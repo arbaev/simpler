@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Simpler.application.db.create_table(:tests) do
 #   primary_key :id
 #   String :title, null: false

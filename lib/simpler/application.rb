@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 require 'singleton'
 require 'sequel'
@@ -27,14 +29,26 @@ module Simpler
     end
 
     def call(env)
-      route = @router.route_for(env)
-      controller = route.controller.new(env)
-      action = route.action
+      @request = Rack::Request.new(env)
+      route = @router.route_for(@request)
+      env['simpler.params'] = @request.params
+      return not_found if route.nil?
 
+      controller = route.controller.new(@request)
+      action = route.action
+      env['simpler.params'] = collect_params(route, @request)
       make_response(controller, action)
     end
 
     private
+
+    def collect_params(route, request)
+      request.params.merge(route.path_params(request.path))
+    end
+
+    def not_found
+      [404, { 'Content-Type' => 'text/plain' }, ["URL not found\n"]]
+    end
 
     def require_app
       Dir["#{Simpler.root}/app/**/*.rb"].each { |file| require file }

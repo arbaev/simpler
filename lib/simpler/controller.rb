@@ -1,13 +1,16 @@
+# frozen_string_literal: true
+
 require_relative 'view'
 
 module Simpler
   class Controller
+    CONTENT_TYPES = { plain: 'text/plain', path: 'text/html' }.freeze
 
     attr_reader :name, :request, :response
 
-    def initialize(env)
+    def initialize(request)
       @name = extract_name
-      @request = Rack::Request.new(env)
+      @request = request
       @response = Rack::Response.new
     end
 
@@ -15,39 +18,57 @@ module Simpler
       @request.env['simpler.controller'] = self
       @request.env['simpler.action'] = action
 
-      set_default_headers
       send(action)
-      write_response
+
+      template = @request.env['simpler.template']
+      write_response(render_response(template))
 
       @response.finish
     end
 
     private
 
+    def status(code)
+      @response.status = code
+    end
+
     def extract_name
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
 
-    def set_default_headers
-      @response['Content-Type'] = 'text/html'
+    def set_content_type_header
+      type = @request.env['simpler.template'].keys.first
+      @response['Content-Type'] = CONTENT_TYPES[type]
     end
 
-    def write_response
-      body = render_body
-
+    def write_response(body)
       @response.write(body)
     end
 
-    def render_body
+    def render_response(template)
+      render(template)
+      set_content_type_header
       View.new(@request.env).render(binding)
     end
 
-    def params
-      @request.params
+    def render(template)
+      template = if template.is_a?(String)
+                   { path: template }
+                 elsif template.is_a?(Hash)
+                   template
+                 else
+                   { path: [name, @request.env['simpler.action']].join('/') }
+                 end
+
+      @request.env['simpler.template'] = template
     end
 
-    def render(template)
-      @request.env['simpler.template'] = template
+    def params
+      @request.env['simpler.params']
+    end
+
+    def headers
+      @response.header
     end
 
   end
